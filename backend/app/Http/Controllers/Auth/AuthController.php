@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class AuthContoller extends ApiController
+class AuthController extends ApiController
 {
 
     public function register(Request $request)
@@ -18,7 +18,7 @@ class AuthContoller extends ApiController
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required',
-            'role_id' => 'required|exists:role,id'
+            'role_id' => 'required|exists:roles,id'
         ]);
 
 
