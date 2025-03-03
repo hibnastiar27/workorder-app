@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response;
+// use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
@@ -14,23 +14,36 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, $role)
     {
-        $roles = array_map('intval', $roles);
+        // $roles = array_map('intval', $roles);
 
         if (!Auth::check()) {
             return response()->json([
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized',
+                'debug' => 'User not authenticated'
             ], 401);
         }
 
-        if (!in_array(Auth::user()->role_id, $roles)) {
+        $roleId = Auth::user()->role_id;
+
+        if ($roleId != $role) {
             return response()->json([
-                'message' => 'Forbidden',
-                'role_access' => $roles
+                'message' => 'Forbiden: Access Denied',
+                'user_role' => $roleId,
+                'required_role' => $role
             ], 403);
         }
 
         return $next($request);
     }
 }
+
+
+        // if (!in_array($roleId, $roles)) {
+        //     return response()->json([
+        //         'message' => 'Forbidden',
+        //         'user_role' => $roleId,
+        //         'allowed_roles' => $roles
+        //     ], 403);
+        // }
