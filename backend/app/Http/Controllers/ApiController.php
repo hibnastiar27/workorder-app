@@ -30,7 +30,7 @@ class ApiController extends Controller
             'message' => $message,
         ];
 
-        if (!empty($data)) {
+        if (!empty($errors)) {
             $response['errors'] = $errors;
         }
         return response()->json($response, $status);
