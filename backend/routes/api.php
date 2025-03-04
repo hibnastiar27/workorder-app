@@ -7,10 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'expiredToken'])->group(function () {
-    Route::get('/user', function (Request $request) {
-        return response()->json($request->user(), 200);
-    });
-    Route::middleware(['role:0'])->group(function () {
+    Route::middleware(['role:1'])->group(function () {
+        Route::get('/user', function (Request $request) {
+            return response()->json($request->user(), 200);
+        });
+
         Route::prefix('workorders-pm')->group(function () {
             Route::get('/', [WorkorderController::class, 'index']);
             Route::post('/', [WorkorderController::class, 'store']);
