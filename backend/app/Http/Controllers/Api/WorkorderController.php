@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\WorkorderRequest;
 use App\Http\Resources\WorkorderResource;
+use App\Models\ProductionNote;
 use App\Models\Workorder;
 use App\Services\WorkorderService;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class WorkorderController extends ApiController
 {
@@ -106,13 +109,60 @@ class WorkorderController extends ApiController
      */
     public function updateStatus(WorkorderRequest $request, Workorder $workorder)
     {
-        $validateData = $request->only(['status']);
+        $validateData = $request->only(['status', 'quantity_completed']);
 
-        $updatedWorkorder = $this->workorderService->updateStatus($workorder, $validateData);
+        try {
+            $updatedWorkorder = $this->workorderService->updateStatus($workorder, $validateData);
+            return $this->sendResponse(
+                new WorkorderResource($updatedWorkorder),
+                'Workorder Status Updated Successfully'
+            );
+        } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), [], 422);
+        }
+    }
+
+    /**
+     * Menambahkan Catatan produksi
+     */
+    public function addProductionNote(Request $request, Workorder $workorder)
+    {
+        $request->validate([
+            'note' => 'required|string|max:255'
+        ]);
+
+        if ($workorder->status != 'In Progress') {
+            return $this->sendError(
+                'Workoder is not In Progress',
+                [],
+                400
+            );
+        }
+
+        $note = ProductionNote::create([
+            'workorder_id' => $workorder->id,
+            'note' => $request->note,
+            'created_by' => Auth::id(),
+        ]);
 
         return $this->sendResponse(
-            new WorkorderResource($updatedWorkorder),
-            'Workorder Status Updated Successfully'
+            $note,
+            'Production note added successfully',
+            201
+        );
+    }
+
+
+    /**
+     * Menampilkan Semua catatan by operator
+     */
+    public function getProductionNotes(Workorder $workorder)
+    {
+        $notes = ProductionNote::where('workorder_id', $workorder->id)->get();
+
+        return $this->sendResponse(
+            $notes,
+            'All production notes show successfully'
         );
     }
 }

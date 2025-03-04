@@ -23,6 +23,9 @@ Route::middleware(['auth:sanctum', 'expiredToken'])->group(function () {
     Route::middleware(['role:2'])->prefix('workorders-op')->group(function () {
         Route::get('/assigned', [WorkorderController::class, 'assignWorkorders']);
         Route::patch('/assigned/{workorder}', [WorkorderController::class, 'updateStatus'])->name('workorders-op.updateStatus');
+
+        Route::get('/assigned/{workorder}/notes', [WorkorderController::class, 'getProductionNotes'])->name('workorders-op.getProductionNotes');
+        Route::post('/assigned/{workorder}/notes', [WorkorderController::class, 'addProductionNote'])->name('workorders-op.addProductionNote');
     });
 
     Route::delete('/logout', [AuthController::class, 'logout'])->name('logout');
