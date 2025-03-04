@@ -26,6 +26,13 @@ class WorkorderRequest extends FormRequest
             return [
                 'status' => 'required|in:Pending,In Progress,Completed',
             ];
+
+            // Jika status akan diubah ke Completed, quantity_completed wajib disertakan
+            if ($this->input('status') === 'Completed') {
+                $rules['quantity_completed'] = 'required|integer|min:1';
+            }
+
+            return $rules;
         }
 
         return [
