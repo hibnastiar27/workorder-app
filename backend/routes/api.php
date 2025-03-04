@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\WorkorderController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
